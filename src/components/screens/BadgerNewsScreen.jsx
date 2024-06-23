@@ -1,8 +1,9 @@
-import { Text, View, ScrollView, ActivityIndicator } from "react-native";
+import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 // can use activity indicator instead of loading text (gives a spinning circle)
 import { useState, useEffect } from "react";
 import { Card, Title } from 'react-native-paper';
 import CS571 from '@cs571/mobile-client'
+import { useNavigation } from '@react-navigation/native';
 
 function BadgerNewsScreen(props) {
 
@@ -23,7 +24,14 @@ function BadgerNewsScreen(props) {
             setLoading(false);
         })
         .catch(error => console.error('Error fetching data:', error));
+        setLoading(false);
     },[]);
+
+    const navigation = useNavigation();
+
+    const handleCardPress = (articleId, title, img) => {
+        navigation.navigate('Article', { articleId, title, img });
+    };
 
     return (
         <ScrollView>
@@ -31,12 +39,14 @@ function BadgerNewsScreen(props) {
                 <ActivityIndicator size="large" color="blue" style={{ marginTop: 20 }} />
             ) : (
                 articles.map((article) => (
-                    <Card key={article.fullArticleId} style={{ margin: 10 }}>
-                        <Card.Cover source={{ uri: "https://raw.githubusercontent.com/CS571-SU24/hw8-api-static-content/main/" + article.img }}/>
-                        <Card.Content style={{ padding: 10 }}>
-                            <Title>{article.title}</Title>
-                        </Card.Content>
-                    </Card>
+                    <TouchableOpacity key={article.id} onPress={() => handleCardPress(article.fullArticleId, article.title, article.img)}>
+                        <Card style={{ margin: 10 }}>
+                            <Card.Cover source={{ uri: "https://raw.githubusercontent.com/CS571-SU24/hw8-api-static-content/main/" + article.img }}/>
+                            <Card.Content style={{ padding: 10 }}>
+                                <Title>{article.title}</Title>
+                            </Card.Content>
+                        </Card>
+                    </TouchableOpacity>
                 ))
             )}
         </ScrollView>
